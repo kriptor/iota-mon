@@ -1,0 +1,10 @@
+{
+  "udp://sample1.example.com:14600": {
+    "name": "John Doe1",
+    "slack": "jd1"
+  },
+  "tcp://sample2.example.com:15600": {
+    "name": "John Doe2",
+    "slack": "jdoe2"
+  }
+}
