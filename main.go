@@ -115,7 +115,7 @@ func main() {
 		if statsDClientFailSleep < 60 {
 			statsDClientFailSleep += 5
 		}
-		log.WithError(err).Error("failed to create StatsD client with options: ", options, "- sleeping for ", statsDClientFailSleep, "seconds ...")
+		log.WithError(err).Error("failed to create StatsD client with options: ", options, " - sleeping for ", statsDClientFailSleep, " seconds ...")
 		time.Sleep(time.Second * time.Duration(statsDClientFailSleep))
 	}
 	defer statsDClient.Close()
