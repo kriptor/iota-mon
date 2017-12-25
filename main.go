@@ -130,15 +130,21 @@ func main() {
 	select {}
 }
 
+func diffOrZero(a, b int64) int64 {
+	if a > b {
+		return a - b
+	}
+	return 0
+}
+
 func checkIotaNode(ticker *time.Ticker, api *giota.API, defaultStatsDClient *statsd.Client) {
 	var prevNeighborsMap = make(map[string]giota.Neighbor)
 	var statsDClientsMap = make(map[string]*statsd.Client)
-	iterationsToSkip := 1
 
 	for range ticker.C {
 		log.Info("calling GetNodeInfo ...")
 		if resp, err := api.GetNodeInfo(); err != nil {
-			log.WithError(err).Error("failed to receive node status from iota node from:", iotaNodeCmdEndpoint)
+			log.WithError(err).Error("failed to receive node status from iota node ", iotaNodeCmdEndpoint)
 			c := statsDClientsMap["nodeinfo"]
 			if c == nil {
 				c = defaultStatsDClient
@@ -233,17 +239,14 @@ func checkIotaNode(ticker *time.Ticker, api *giota.API, defaultStatsDClient *sta
 				}
 
 				// statsd
-				if iterationsToSkip <= 0 {
-					c.Count("neighbor_txs_all", n.NumberOfAllTransactions-prevNeighbor.NumberOfAllTransactions)
-					c.Count("neighbor_txs_new", n.NumberOfNewTransactions-prevNeighbor.NumberOfNewTransactions)
-					c.Count("neighbor_txs_invalid", n.NumberOfInvalidTransactions-prevNeighbor.NumberOfInvalidTransactions)
-					c.Count("neighbor_txs_sent", n.NumberOfSentTransactions-prevNeighbor.NumberOfSentTransactions)
-					c.Count("neighbor_tx_rnd_reqs", n.NumberOfRandomTransactionRequests-prevNeighbor.NumberOfRandomTransactionRequests)
-				}
+				c.Count("neighbor_txs_all", diffOrZero(n.NumberOfAllTransactions, prevNeighbor.NumberOfAllTransactions))
+				c.Count("neighbor_txs_new", diffOrZero(n.NumberOfNewTransactions, prevNeighbor.NumberOfNewTransactions))
+				c.Count("neighbor_txs_invalid", diffOrZero(n.NumberOfInvalidTransactions, prevNeighbor.NumberOfInvalidTransactions))
+				c.Count("neighbor_txs_sent", diffOrZero(n.NumberOfSentTransactions, prevNeighbor.NumberOfSentTransactions))
+				c.Count("neighbor_tx_rnd_reqs", diffOrZero(n.NumberOfRandomTransactionRequests, prevNeighbor.NumberOfRandomTransactionRequests))
 
 				prevNeighborsMap[neighborKey] = n
 			}
-			iterationsToSkip--
 		}
 	}
 }
