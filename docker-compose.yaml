@@ -1,0 +1,41 @@
+version: "3"
+services:
+
+  influxdb:
+    image: influxdb:alpine
+    volumes:
+      - /iota-mon/data/influxdb:/usr/local/var/influxdb
+      - /iota-mon/config/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+
+  telegraf:
+    image: telegraf:alpine
+    volumes:
+      - /iota-mon/config/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    ports:
+      - "8125:8125/udp"
+    depends_on:
+      - influxdb
+      - grafana
+
+  grafana:
+    image: appcelerator/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - /iota-mon/config/grafana:/etc/grafana
+      - /iota-mon/data/grafana:/var/lib/grafana
+    depends_on:
+      - influxdb
+
+  iotamon:
+    command: ["-i", "http://IOTA_IRI_IP_LOOPBACK_WILL_NOT_WORK:14265", "-o", "telegraf:8125", "-m", "/iota-mon_neighbors_map.json", "-r", "7"]
+    image: iota-mon:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /iota-mon/config/iota-mon_neighbors_map.json:/iota-mon_neighbors_map.json
+    depends_on:
+      - influxdb
+      - grafana
+      - telegraf
