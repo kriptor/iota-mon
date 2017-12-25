@@ -18,7 +18,11 @@ program option | type | description | default value | additional description
 
 Prerequisite is that your IOTA IRI command interface (usually http://127.0.0.1:14265) is bound to some IP other than loopback (127.0.0.1), then:  
 - install the latest Docker engine (1.13.0+) 
-- put Dockerfile and docker-compose.yaml into some directory
-- replace `IOTA_IRI_IP_LOOPBACK_WILL_NOT_WORK` (inside docker-compose.yaml) with the IP where your IOTA IRI command interface is listening
+- put `Dockerfile` and `docker-compose.yaml` (from `Docker` directory) into some directory
+- replace `IOTA_IRI_IP_LOOPBACK_WILL_NOT_WORK` (inside `docker-compose.yaml`) with the IP where your IOTA IRI command interface is listening
 - create directory paths (mkdir -p) `/iota-mon/config/grafana`, `/iota-mon/data/influxdb` and `/iota-mon/data/grafana`
-- copy 
+- put `influxdb.conf`, `telegraf.conf` and `iota-mon_neighbors_map.json` (from `sample-config` directory) into `/iota-mon/config` you just created
+- edit `iota-mon_neighbors_map.json` to map your neighbors
+- cd to the directory you put `Dockerfile` and `docker-compose.yaml` in
+- to start execute `docker-compose -f docker-compose.yaml up --no-start && docker-compose -f docker-compose.yaml start`
+- to stop execute `docker-compose -f docker-compose.yaml start`
