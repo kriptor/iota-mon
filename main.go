@@ -109,10 +109,14 @@ func main() {
 			"statsd_addr", tagValueCleanupReplacer.Replace(statsDAddress),
 			"request_interval", strconv.FormatInt(requestInterval, 10))}
 
+	statsDClientFailSleep := 0
 	statsDClient, err := statsd.New(options...)
-	if err != nil {
-		log.WithError(err).Fatal("failed to create StatsD client with options: ", options)
-		os.Exit(1)
+	for err != nil {
+		if statsDClientFailSleep < 60 {
+			statsDClientFailSleep += 5
+		}
+		log.WithError(err).Error("failed to create StatsD client with options: ", options, "- sleeping for ", statsDClientFailSleep, "seconds ...")
+		time.Sleep(time.Second * time.Duration(statsDClientFailSleep))
 	}
 	defer statsDClient.Close()
 
