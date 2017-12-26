@@ -24,5 +24,11 @@ Prerequisite is that your IOTA IRI command interface (usually http://127.0.0.1:1
 - put `influxdb.conf`, `telegraf.conf` and `iota-mon_neighbors_map.json` (from `sample-config` directory) into `/iota-mon/config` you just created
 - edit `iota-mon_neighbors_map.json` to map your neighbors
 - cd to the directory you put `Dockerfile` and `docker-compose.yaml` in
-- to start execute `docker-compose -f docker-compose.yaml up --no-start && docker-compose -f docker-compose.yaml start`
-- to stop execute `docker-compose -f docker-compose.yaml start`
+- to start execute `docker-compose -f docker-compose.yaml up --build --no-start && docker-compose -f docker-compose.yaml start`
+- to stop execute `docker-compose -f docker-compose.yaml stop`
+
+## Set-up Grafana
+- Grafana listens on exposed port 3000
+- default username is `admin` and default password is `changeme`
+- create InfluxDB datasource with url `http://influxdb:8086` and database `IOTA`
+- create a dashboard, configure alerting, ...
