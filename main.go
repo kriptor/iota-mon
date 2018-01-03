@@ -17,6 +17,7 @@ import (
 	"github.com/kriptor/giota"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/alexcesaro/statsd.v2"
+	"net/http"
 )
 
 type NeighborMappedData struct {
@@ -120,7 +121,10 @@ func main() {
 	}
 	defer statsDClient.Close()
 
-	api := giota.NewAPI(iotaNodeCmdEndpoint, nil)
+	httpClient := &http.Client{
+		Timeout: time.Second * 3,
+	}
+	api := giota.NewAPI(iotaNodeCmdEndpoint, httpClient)
 
 	repeatTicker := time.NewTicker(time.Second * time.Duration(requestInterval))
 	defer repeatTicker.Stop()
